@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faction Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .dark-mode {
+            background-color: #121212;
+            color: #ddd;
+        }
+
+        .dark-mode h1,
+        .dark-mode h2,
+        .dark-mode label {
+            color: #bbb;
+        }
+
+        .dark-mode table,
+        .dark-mode th,
+        .dark-mode td {
+            border: 1px solid #444;
+        }
+
+        .dark-mode th {
+            background-color: #333;
+        }
+
+        .dark-mode tr:nth-child(even) {
+            background-color: #222;
+        }
+
+        h1,
+        h2 {
+            text-align: center;
+            color: #444;
+        }
+
+        form {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+            max-width: 400px;
+        }
+
+        .dark-mode form {
+            background: #1e1e1e;
+            box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        .dark-mode label {
+            color: #aaa;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .dark-mode input[type="text"],
+        .dark-mode input[type="number"] {
+            background: #333;
+            border: 1px solid #555;
+            color: #ddd;
+        }
+
+        button {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 190px;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .dark-mode button {
+            background-color: #388e3c;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid #ddd;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8f9fa;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .admin-actions {
+            display: flex;
+            gap: 20px;
+            justify-content: space-between;
+        }
+
+        .admin-actions form {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .admin-actions input[type="number"] {
+            width: 225px;
+            margin-bottom: 10px;
+        }
+
+        .admin-actions button {
+            width: 250px;
+        }
+
+        .scrollable-table {
+            height: calc(100vh - 200px);
+            /* Adjust this value based on your header and other content height */
+            overflow-y: auto;
+        }
+
+        .dark-mode .scrollable-table {
+            background: #1a1a1a;
+        }
+
+        .toggle-dark-mode {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: #333;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .dark-mode .toggle-dark-mode {
+            background: #fff;
+            color: #333;
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+
+        .dropdown-content button {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            width: 100%;
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+
+        .dropdown-content button:hover {
+            background-color: #f1f1f1;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .toggle-dark-mode {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body data-factions='<%= JSON.stringify(factions.map(f => f.name)) %>'>
+    <button class="toggle-dark-mode">Toggle Dark Mode</button>
+    <h1>Faction Management</h1>
+    <% if (isAdmin) { %>
+        <!-- Add Faction section -->
+        <h2>Add Faction</h2>
+        <form action="/add-faction" method="POST">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+            <label for="leader">Leader:</label>
+            <input type="text" id="leader" name="leader" required>
+            <label for="memberCount">Member Count:</label>
+            <input type="number" id="memberCount" name="memberCount" required>
+            <label for="userID">User ID:</label>
+            <input type="text" id="userID" name="userID" required>
+            <button type="submit">Add Faction</button>
+        </form>
+        <% } %>
+
+            <!-- Existing faction management section -->
+            <h2>Manage Factions</h2>
+            <div class="scrollable-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Faction</th>
+                            <th>Economy</th>
+                            <th>Money</th>
+                            <% if (isAdmin) { %>
+                                <th>Affect Economy</th>
+                                <th>Admin Action</th>
+                                <% } %>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% factions.forEach(faction=> { %>
+                            <tr>
+                                <td>
+                                    <%= faction.name %>
+                                </td>
+                                <td>
+                                    <%= faction.economy %>
+                                </td>
+                                <% if (userFactions.some(uf=> uf.name === faction.name)) { %>
+                                    <td>
+                                        <%= faction.money %>
+                                    </td>
+                                    <% } %>
+                                        <% if (isAdmin) { %>
+                                            <td>
+                                                <div class="admin-actions">
+                                                    <form action="/update-economy" method="POST">
+                                                        <input type="hidden" name="factionName"
+                                                            value="<%= faction.name %>">
+                                                        <label for="economy<%= faction.name %>">Economy:</label>
+                                                        <input type="number" id="economy<%= faction.name %>"
+                                                            name="economy" value="<%= faction.economy %>">
+                                                        <button type="submit">Update Economy</button>
+                                                    </form>
+                                                    <form action="/update-money" method="POST">
+                                                        <input type="hidden" name="factionName"
+                                                            value="<%= faction.name %>">
+                                                        <label for="money<%= faction.name %>">Money:</label>
+                                                        <input type="number" id="money<%= faction.name %>" name="money"
+                                                            value="<%= faction.money %>">
+                                                        <button type="submit">Update Money</button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                            <% } %>
+                                                <% if (userFactions.some(uf=> uf.name === faction.name)) { %>
+                                                    <!-- <td><%= faction.money %></td> -->
+                                                    <td>
+                                                        <div class="dropdown">
+                                                            <button>Options</button>
+                                                            <div class="dropdown-content">
+                                                                <button
+                                                                    onclick="handleAction('<%= faction.name %>', 'sabotage')">Sabotage</button>
+                                                                <button
+                                                                    onclick="handleAction('<%= faction.name %>', 'trade')">Trade</button>
+                                                                <button
+                                                                    onclick="handleAction('<%= faction.name %>', 'forfeit')">Forfeit</button>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <% } %>
+                                                        <% if (isAdmin) { %>
+                                                            <td>
+                                                                <form action="/remove-faction" method="POST">
+                                                                    <input type="hidden" name="factionName"
+                                                                        value="<%= faction.name %>">
+                                                                    <button type="submit">Remove Faction</button>
+                                                                </form>
+                                                            </td>
+                                                            <% } %>
+                            </tr>
+                            <% }) %>
+                    </tbody>
+                </table>
+            </div>
+            <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" integrity="sha384-2huaZvOR9iDzHqslqwpR87isEmrfxqyWOF7hr7BY6KG0+hVKLoEXMPUJw3ynWuhO" crossorigin="anonymous"></script>
+            <script>
+
+                // Toggle dark mode
+                function toggleDarkMode() {
+                    document.body.classList.toggle('dark-mode');
+                    // Save the preference in localStorage
+                    if (document.body.classList.contains('dark-mode')) {
+                        localStorage.setItem('dark-mode', 'enabled');
+                    } else {
+                        localStorage.setItem('dark-mode', 'disabled');
+                    }
+                }
+
+                // Load dark mode preference on page load
+                function loadDarkModePreference() {
+                    const darkModePreference = localStorage.getItem('dark-mode');
+                    if (darkModePreference === 'enabled') {
+                        document.body.classList.add('dark-mode');
+                    } else {
+                        document.body.classList.remove('dark-mode');
+                    }
+                }
+
+                document.querySelector('.toggle-dark-mode').addEventListener('click', toggleDarkMode);
+                document.addEventListener('DOMContentLoaded', loadDarkModePreference);
+
+                function handleAction(factionName, action) {
+                    const validFactions = JSON.parse(document.body.getAttribute('data-factions'));
+                    if (action === 'trade') {
+                        let tradeFaction;
+                        do {
+                            tradeFaction = prompt(`Enter the faction you wish to trade with: `);
+                            if (tradeFaction === null) {
+                                return;
+                            }
+                            if (!validFactions.includes(tradeFaction)) {
+                                alert(`Invalid faction name. Please try again.`);
+                            }
+                        } while (!validFactions.includes(tradeFaction));
+
+                        // Send WebSocket message to server
+                        const message = {
+                            action: 'trade',
+                            factionName: factionName,
+                            targetFaction: tradeFaction
+                        };
+                        ws.send(JSON.stringify(message)); // Assuming 'ws' is your WebSocket connection
+                    } else {
+                        alert(`Action: ${action}\nFaction: ${factionName}`);
+                    }
+                }
+
+            </script>
+</body>
+
+</html>
