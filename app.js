@@ -15,7 +15,7 @@ const port = 8080;
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
 client.login(process.env.DISCORD_BOT_TOKEN);
 
-const adminIds = ['623172201088286725']; // Replace with actual Discord admin IDs
+const adminIds = ['623172201088286725'];
 
 // Middleware setup
 app.use(express.json());
@@ -282,7 +282,7 @@ wss.on('connection', function connection(ws) {
   ws.send('Welcome to the WebSocket server!');
 });
 
-// Example function to send a message to all connected clients
+// Broadcasts a message to all clients
 function broadcastMessage(message) {
   wss.clients.forEach(function each(client) {
       if (client.readyState === WebSocket.OPEN) {
